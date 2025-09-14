@@ -7,8 +7,10 @@ import remarkGfm from 'remark-gfm';
 
 const withMDX = createMDX({
   extension: /\.(md|mdx)$/,
-  remarkPlugins: [remarkGfm],
-  rehypePlugins: [],
+  options: {
+    remarkPlugins: [],
+    rehypePlugins: [],
+  },
 });
 
 const nextConfig: NextConfig = {
