@@ -1,7 +1,23 @@
-import type { NextConfig } from "next";
+/* eslint-disable */
+import createMDX from '@next/mdx';
+import type { NextConfig } from 'next';
+import remarkGfm from 'remark-gfm';
+
+
+
+const withMDX = createMDX({
+  extension: /\.(md|mdx)$/,
+  remarkPlugins: [remarkGfm],
+  rehypePlugins: [],
+});
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  pageExtensions: ['js', 'jsx', 'md', 'mdx', 'ts', 'tsx'],
+  typedRoutes: true,
+  experimental: {
+    viewTransition: true,
+    reactCompiler: true,
+  },
 };
 
-export default nextConfig;
+export default withMDX(nextConfig);

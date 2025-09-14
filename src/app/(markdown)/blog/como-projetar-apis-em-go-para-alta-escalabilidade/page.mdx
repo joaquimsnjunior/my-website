@@ -1,0 +1,99 @@
+export const metadata = {
+	title: 'Como Projetar APIs em Go para Alta Escalabilidade | Joaquim Silva'
+};
+
+# Como Projetar APIs em Go para Alta Escalabilidade
+
+## Introdução
+
+Nos últimos anos, o Go (Golang) se consolidou como uma das linguagens mais utilizadas em sistemas distribuídos e serviços de alta performance. Plataformas como Uber, Cloudflare e iFood confiam em Go para lidar com milhões de requisições diárias.
+
+Mas o que torna Go tão adequado para esse cenário? E, principalmente: como projetar APIs realmente escaláveis em Go?
+
+Neste artigo, compartilho boas práticas que vão além do “escrever handlers” — cobrindo desde arquitetura até observabilidade, passando por concorrência, infraestrutura e cases reais.
+
+
+
+## 1. Entendendo escalabilidade em APIs
+
+Antes de escrever a primeira linha de código, precisamos entender o que significa escalar.
+
+- **Escalabilidade vertical:** aumentar recursos de um único servidor (CPU, memória).
+- **Escalabilidade horizontal:** distribuir a carga em múltiplas instâncias.
+
+Para APIs modernas, horizontal é o caminho natural — e isso exige que o design seja *stateless*, isto é, sem dependência de estado local no servidor.
+
+> **Princípio base:** cada requisição deve poder ser atendida por qualquer instância da API, sem amarras.
+
+
+## 2. Por que Go é a escolha certa?
+
+- **Concorrência leve:** goroutines permitem lidar com milhares de requisições em paralelo sem custo alto de threads.
+- **Simplicidade:** a curva de aprendizado é menor que em linguagens como Java ou C++.
+- **Runtime enxuta:** garbage collector eficiente e gerenciamento automático de memória.
+- **Ecossistema maduro:** frameworks como Gin e Fiber, bibliotecas de gRPC e suporte nativo para profiling/benchmarking.
+
+Isso explica por que empresas de alta escala migraram serviços críticos para Go.
+
+
+## 3. Arquitetura de APIs em Go
+
+Uma API escalável não é só um conjunto de rotas — é uma arquitetura pensada para crescer.
+
+- **REST vs gRPC:** REST é universal, mas gRPC oferece eficiência de rede e contratos fortes via Protobuf.
+- **Clean Architecture:** separar camadas (entidades, casos de uso, interfaces) garante que a API seja fácil de manter e escalar.
+- **Statelessness:** sessão de usuário, cache ou filas → devem estar fora do servidor (Redis, Kafka, bancos distribuídos).
+
+
+## 4. Infraestrutura e deploy escalável
+
+- **Docker + Kubernetes:** cada serviço pode ser empacotado, replicado e balanceado em clusters.
+- **Load balancing:** Nginx, Envoy ou Ingress Controller no Kubernetes.
+- **Cache estratégico:** Redis para dados de sessão, CloudFront/CDN para conteúdo estático.
+
+Escalar API sem pensar em infraestrutura resiliente é receita para gargalos.
+
+
+## 5. Observabilidade: o que não se mede não escala
+
+Uma API que escala precisa ser observável:
+
+- **Logs estruturados** (JSON logs para fácil indexação em ELK Stack).
+- **Métricas** (Prometheus + Grafana para monitorar throughput, latência, erros).
+- **Tracing distribuído** (OpenTelemetry para seguir requisições entre microserviços).
+
+Escalar é resolver gargalos específicos — e só se descobre gargalo com dados concretos.
+
+
+## 6. Exemplo prático em Go (snippet)
+
+Aqui um handler simples em Gin com boas práticas de timeout e contexto:
+
+```go
+func MyHandler(c *gin.Context) {
+    ctx, cancel := context.WithTimeout(c.Request.Context(), 2*time.Second)
+    defer cancel()
+
+    // lógica do handler usando ctx
+}
+```
+
+> **Ponto-chave:** nunca esqueça de propagar contexto (`context.Context`) para evitar goroutines presas e permitir cancelamento controlado em cenários de alta carga.
+
+
+## 7. Estudo de caso rápido
+
+Imagine um sistema de pedidos online:
+
+- Cada requisição de “novo pedido” dispara processos de pagamento, estoque e notificação.
+- Em Go, podemos usar worker pools com goroutines para processar mensagens de uma fila (Kafka/RabbitMQ).
+- O escalonamento vem ao simplesmente aumentar o número de workers ou instâncias no Kubernetes.
+
+Isso garante que a API responda rápido e o processamento seja feito de forma distribuída.
+
+
+## Conclusão
+
+Projetar APIs escaláveis em Go exige uma visão que vai além do código: é preciso pensar em concorrência, arquitetura limpa, infraestrutura resiliente e observabilidade.
+
+Se feito corretamente, você terá um backend capaz de lidar com picos de tráfego com simplicidade,
