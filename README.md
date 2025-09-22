@@ -1,6 +1,6 @@
 # Joaquim Silva – Portfolio Website  
 
-![Preview](../my-website/public/homepage.png) <!-- opcional, caso queira colocar uma imagem preview do site -->
+![Preview](/public/homepage.png) 
 
 ## 📌 Sobre o Projeto  
 Este repositório contém o código-fonte do meu website profissional hospedado em [joaquimsilvadev.vercel.app](https://joaquimsilvadev.vercel.app/).  
