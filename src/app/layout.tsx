@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Joaquim Silva",
+  title: "Joaquim Silva - Hello, World!",
   description: "Desenvolvedor Backend",
 };
 

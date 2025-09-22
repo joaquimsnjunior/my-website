@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import React from 'react'
-import Logotipo from '../assets/icone-js.png'
+import Logotipo from '../assets/eyeroll.gif'
 
 function Logo() {
   return (
@@ -8,8 +8,8 @@ function Logo() {
       <Image
         src={Logotipo}
         alt="Logo"
-        width={100}
-        height={100}
+        width={30}
+        height={30}
       />
     </div>
   )
