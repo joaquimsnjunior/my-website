@@ -1,37 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 
 
-function ReadingProgress() {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const updateProgress = () => {
-      const scrolled = window.scrollY;
-      const total = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = (scrolled / total) * 100;
-      setProgress(progress);
-    };
-
-    window.addEventListener('scroll', updateProgress);
-    return () => window.removeEventListener('scroll', updateProgress);
-  }, []);
-
-  return (
-    <div className='fixed top-0 left-0 w-full h-1 bg-gray-200 z-50'>
-      <div
-        className='h-full bg-blue-400 transition-all duration-150'
-        style={{ width: `${progress}%` }}
-      />
-    </div>
-  );
-}
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <ReadingProgress />
       <div className='w-full flex flex-col items-center justify-center py-10'>
         {/* Header com título estilizado */}
         <header className='w-full md:w-[100ch] mb-8 text-center'>
