@@ -10,15 +10,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {/* Header com título estilizado */}
         <header className='w-full md:w-[100ch] mb-8 text-center'>
           <h1 className='text-3xl md:text-4xl font-bold underline underline-offset-8 decoration-4 decoration-blue-400 mb-4'>
-            Como Projetar APIs em Go para Alta Escalabilidade
+            Tilt + Go: Acelerando o Desenvolvimento de Aplicações Modernas
           </h1>
         </header>
+        {/* **Palavras-chave**: Tilt, Go, Golang, Kubernetes, Docker, DevOps, Hot Reload, Desenvolvimento Local, Cloud Native, Microserviços */}
         {/* Tags */}
         <div className='auto-cols-auto flex flex-wrap gap-2 mb-6 justify-center'>
-          {['Go', 'API', 'Escalabilidade', 'Backend'].map((tag) => (
+          {['Tilt', 'Go', 'K8s', 'Docker', 'DevOps', 'Microserviços'].map((tag) => (
             <span
               key={tag}
-              className='px-8 py-2 bg-blue-100 text-blue-900 text-xs'
+              className='px-8 py-2 bg-blue-100 text-blue-900 text-xs flex'
             >
               {tag}
             </span>

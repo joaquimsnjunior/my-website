@@ -1,0 +1,395 @@
+export const metadata = {
+  title:
+    "Tilt + Go: Acelerando o Desenvolvimento de Aplicações modernas | Joaquim Silva",
+};
+
+## Introdução
+
+O desenvolvimento de aplicações **cloud-native** modernas apresenta desafios únicos de produtividade. O ciclo tradicional de desenvolvimento — _codificar → compilar → construir → implantar → testar_ — pode consumir minutos valiosos a cada iteração, especialmente em ambientes **Kubernetes** complexos.
+
+O **Tilt** surge como uma ferramenta open-source que automatiza e acelera drasticamente o ciclo de feedback no desenvolvimento local. Quando combinado com **Go**, cria-se um ambiente de desenvolvimento altamente eficiente e produtivo.
+
+![Tilt with gopher](/posts/artigo_tilt.png)
+
+## O que é o Tilt?
+
+Tilt é uma ferramenta de desenvolvimento que oferece:
+
+- **Hot reload automático** para containers em Kubernetes e Docker
+- **Monitoramento em tempo real** de builds e logs
+- **Automatização declarativa** de processos de deploy
+- **Redução significativa** do ciclo de feedback
+
+## Por que Tilt + Go é uma Combinação Poderosa?
+
+### Vantagens do Go
+
+- **Compilação ultra-rápida**
+- **Binários estáticos** ideais para containers
+- **Baixo consumo de recursos**
+- **Excelente para microserviços**
+
+### Problemas do Ciclo Tradicional
+
+```bash
+# Fluxo tradicional (30s - 2min por iteração)
+1. Alterar código Go
+2. go build
+3. docker build -t app:latest .
+4. kubectl apply -f deployment.yaml
+5. kubectl rollout status deployment/app
+6. Aguardar Pod reiniciar
+```
+
+### Solução com Tilt
+
+```bash
+# Fluxo com Tilt (2-5s por iteração)
+1. Alterar código Go
+2. Tilt detecta e atualiza automaticamente
+3. Pronto para testar
+```
+
+## Estrutura do Projeto
+
+```
+my-go-app/
+├── main.go              # Aplicação Go
+├── go.mod               # Módulos Go
+├── Dockerfile           # Container multi-stage
+├── Tiltfile             # Configuração Tilt
+├── k8s/                 # Manifestos Kubernetes
+│   ├── deployment.yaml
+│   └── service.yaml
+└── README.md
+```
+
+## Implementação Prática
+
+### 1. Aplicação Go (main.go)
+
+![code_go](/posts/tilt_code.png)
+
+### 2. Dockerfile Multi-Stage Otimizado
+
+![docker tilt](/posts/docker_tilt.png)
+
+# Etapa 1: Build
+
+![docker code](/posts/docker_code_tilt.png)
+
+### 3. Manifesto Kubernetes (k8s/deployment.yaml)
+
+![k8s yaml](/posts/yaml_k8s_tilt.png)
+
+### 4. Tiltfile - Configuração Principal
+
+```python
+# Carrega manifestos Kubernetes
+k8s_yaml('./k8s/deployment.yaml')
+
+# Build da imagem Docker com live update
+docker_build(
+    'tilt-go-app',
+    '.',
+    dockerfile='./Dockerfile',
+    live_update=[
+        sync('./', '/app/'),
+        run('cd /app && go build -o /tmp/server main.go',
+            trigger=['**/*.go']),
+        restart_container()
+    ]
+)
+
+# Configuração do recurso
+k8s_resource('tilt-go-app', port_forwards='8080:8080')
+```
+
+## Comandos Essenciais
+
+### Iniciando o Ambiente
+
+```bash
+# Inicia Tilt com dashboard web
+tilt up
+
+# Modo não-interativo
+tilt up --no-browser
+
+# Com namespace específico
+tilt up -- --namespace=development
+```
+
+### Monitoramento
+
+```bash
+# Visualizar logs
+tilt logs tilt-go-app
+
+# Status dos recursos
+tilt get all
+
+# Forçar rebuild
+tilt trigger tilt-go-app
+```
+
+## Comparação de Performance
+
+<table className="w-full border-collapse border border-gray-600 my-6">
+  <thead>
+    <tr className="bg-gray-800">
+      <th className="border border-gray-600 px-4 py-3 text-left text-gray-200 font-semibold">
+        Cenário
+      </th>
+      <th className="border border-gray-600 px-4 py-3 text-center text-gray-200 font-semibold">
+        Tradicional
+      </th>
+      <th className="border border-gray-600 px-4 py-3 text-center text-gray-200 font-semibold">
+        Com Tilt
+      </th>
+      <th className="border border-gray-600 px-4 py-3 text-center text-gray-200 font-semibold">
+        Melhoria
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td className="border border-gray-600 px-4 py-3 font-medium text-gray-300">
+        <strong>Primeira inicialização</strong>
+      </td>
+      <td className="border border-gray-600 px-4 py-3 text-center text-red-400">
+        2-3 minutos
+      </td>
+      <td className="border border-gray-600 px-4 py-3 text-center text-green-400">
+        30-45 segundos
+      </td>
+      <td className="border border-gray-600 px-4 py-3 text-center text-blue-400 font-semibold">
+        4x mais rápido
+      </td>
+    </tr>
+    <tr className="bg-gray-900">
+      <td className="border border-gray-600 px-4 py-3 font-medium text-gray-300">
+        <strong>Hot reload</strong>
+      </td>
+      <td className="border border-gray-600 px-4 py-3 text-center text-red-400">
+        45-90 segundos
+      </td>
+      <td className="border border-gray-600 px-4 py-3 text-center text-green-400">
+        3-8 segundos
+      </td>
+      <td className="border border-gray-600 px-4 py-3 text-center text-blue-400 font-semibold">
+        10x mais rápido
+      </td>
+    </tr>
+    <tr>
+      <td className="border border-gray-600 px-4 py-3 font-medium text-gray-300">
+        <strong>Deploy completo</strong>
+      </td>
+      <td className="border border-gray-600 px-4 py-3 text-center text-red-400">
+        2-3 minutos
+      </td>
+      <td className="border border-gray-600 px-4 py-3 text-center text-green-400">
+        30-45 segundos
+      </td>
+      <td className="border border-gray-600 px-4 py-3 text-center text-blue-400 font-semibold">
+        4x mais rápido
+      </td>
+    </tr>
+    <tr className="bg-gray-900">
+      <td className="border border-gray-600 px-4 py-3 font-medium text-gray-300">
+        <strong>Debugging</strong>
+      </td>
+      <td className="border border-gray-600 px-4 py-3 text-center text-red-400">
+        5-10 minutos
+      </td>
+      <td className="border border-gray-600 px-4 py-3 text-center text-green-400">
+        1-2 minutos
+      </td>
+      <td className="border border-gray-600 px-4 py-3 text-center text-blue-400 font-semibold">
+        5x mais rápido
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+### Impacto na Produtividade
+
+O Tilt reduz significativamente o tempo de espera durante o desenvolvimento:
+
+- **90% menos tempo** aguardando builds
+- **Economia de 2 horas** por dia de desenvolvimento
+- **Ciclo de feedback** praticamente instantâneo
+- **Foco total** na lógica de negócio
+
+### Tempo Economizado
+
+- **Por dia**: 2 horas
+- **Por semana**: 10 horas
+- **Por mês**: 40 horas
+- **Por ano**: 480 horas
+
+> **Resultado**: Desenvolvedores podem dedicar mais tempo codificando e menos tempo aguardando deploys e rebuilds.
+
+## Funcionalidades Avançadas
+
+### Live Update Otimizado
+
+```python
+docker_build('tilt-go-app', '.',
+    live_update=[
+        # Sincronização seletiva de diretórios
+        sync('./cmd', '/app/cmd'),
+        sync('./pkg', '/app/pkg'),
+
+        # Rebuild condicional
+        run('go build -o /tmp/server ./cmd/main.go',
+            trigger=['cmd/**/*.go', 'pkg/**/*.go']),
+
+        # Reinício inteligente
+        restart_container()
+    ]
+)
+```
+
+### Múltiplos Serviços
+
+```python
+services = [
+    {'name': 'api-gateway', 'port': 8080},
+    {'name': 'user-service', 'port': 8081},
+    {'name': 'order-service', 'port': 8082},
+]
+
+for svc in services:
+    docker_build(svc['name'], f"./{svc['name']}")
+    k8s_resource(svc['name'],
+                port_forwards=f"{svc['port']}:{svc['port']}")
+```
+
+## Dashboard e Monitoramento
+
+O Tilt oferece um dashboard web que exibe:
+
+- **Status dos recursos** em tempo real
+- **Logs centralizados** de todos os serviços
+- **Histórico de builds** e deployments
+- **Métricas de performance**
+- **Triggers manuais** para rebuilds
+
+Acesse em: `http://localhost:10350`
+
+## Melhores Práticas
+
+### Otimização de Build
+
+```dockerfile
+# Use cache eficiente de dependências
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN go build -o server main.go
+```
+
+### Live Update Eficiente
+
+```python
+live_update=[
+    # Sincronize apenas arquivos necessários
+    sync('./src', '/app/src'),
+    run('go build -o /app/server', trigger=['**/*.go'])
+]
+```
+
+### Configuração por Ambiente
+
+```python
+# Configurações flexíveis
+config.define_string('env', args=True, usage='Ambiente (dev/staging/prod)')
+cfg = config.parse()
+
+if cfg.get('env') == 'prod':
+    # Configurações de produção
+    k8s_yaml('./k8s/prod/')
+else:
+    # Configurações de desenvolvimento
+    k8s_yaml('./k8s/dev/')
+```
+
+## Solução de Problemas
+
+### Problemas Comuns
+
+1. **Build lento**: Otimize Dockerfile com multi-stage e cache de dependências
+2. **Live update não funciona**: Verifique os caminhos no `sync()`
+3. **Recursos não aparecem**: Confirme os labels nos manifestos Kubernetes
+
+### Debug
+
+```bash
+# Logs detalhados
+tilt up --verbose
+
+# Analisar Tiltfile
+tilt alpha tiltfile-result
+
+# Limpar cache
+tilt down --delete-namespace
+```
+
+## Casos de Uso Avançados
+
+### Microserviços com Go
+
+```python
+# Configuração para arquitetura de microserviços
+microservices = ['user-api', 'order-api', 'payment-api']
+
+for service in microservices:
+    docker_build(service, f'./services/{service}')
+    k8s_yaml(f'./k8s/{service}.yaml')
+    k8s_resource(service, port_forwards=f'{8080 + microservices.index(service)}:8080')
+```
+
+### Integração com Bancos de Dados
+
+```python
+# Banco PostgreSQL local
+k8s_yaml('./postgres.yaml')
+k8s_resource('postgres', port_forwards='5432:5432')
+
+# Migrations automáticas
+local_resource('db-migrate',
+              'migrate -path ./migrations -database $DATABASE_URL up',
+              resource_deps=['postgres'])
+```
+
+## Recursos Úteis
+
+### Documentação
+
+- [Tilt.dev](https://tilt.dev/) - Site oficial
+- [Documentação oficial](https://docs.tilt.dev/)
+- [API Tiltfile](https://docs.tilt.dev/tiltfile_concepts.html)
+
+### Extensões
+
+- [Helm Extension](https://github.com/tilt-dev/tilt-extensions/tree/master/helm_resource)
+- [Namespace Extension](https://github.com/tilt-dev/tilt-extensions/tree/master/namespace)
+- [Secret Extension](https://github.com/tilt-dev/tilt-extensions/tree/master/secret)
+
+### Comunidade
+
+- [Issues no GitHub](https://github.com/tilt-dev/tilt/issues)
+- [Blog oficial](https://blog.tilt.dev/)
+
+## Conclusão
+
+A integração entre **Tilt** e **Go** transforma o desenvolvimento local de aplicações cloud-native através de:
+
+- **Feedback instantâneo** com ciclo de desenvolvimento 10x mais rápido
+- **Aumento de produtividade** focando no código, não na infraestrutura
+- **Workflow simplificado** com automatização inteligente
+- **Debug eficiente** através de logs centralizados
+- **Suporte à escalabilidade** para arquiteturas complexas
+
+Para desenvolvedores que trabalham com aplicações Go em **Kubernetes** ou ambientes **containerizados**, o Tilt representa uma evolução significativa na experiência de desenvolvimento, eliminando as frustrações do ciclo tradicional e permitindo foco total na lógica de negócio
